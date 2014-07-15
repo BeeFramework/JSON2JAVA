@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_json2java" default="compile.module.json2java">
+  <dirname property="module.json2java.basedir" file="${ant.file.module_json2java}"/>
+  
+  <property name="module.jdk.home.json2java" value="${jdk.home.1.6}"/>
+  <property name="module.jdk.bin.json2java" value="${jdk.bin.1.6}"/>
+  <property name="module.jdk.classpath.json2java" value="jdk.classpath.1.6"/>
+  
+  <property name="compiler.args.json2java" value="-encoding UTF-8 -source 1.6 ${compiler.args}"/>
+  
+  <property name="json2java.output.dir" value="${module.json2java.basedir}/out/production/json2java"/>
+  <property name="json2java.testoutput.dir" value="${module.json2java.basedir}/out/test/json2java"/>
+  
+  <path id="json2java.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="json2java.module.production.classpath">
+    <path refid="${module.jdk.classpath.json2java}"/>
+  </path>
+  
+  <path id="json2java.runtime.production.module.classpath">
+    <pathelement location="${json2java.output.dir}"/>
+  </path>
+  
+  <path id="json2java.module.classpath">
+    <path refid="${module.jdk.classpath.json2java}"/>
+    <pathelement location="${json2java.output.dir}"/>
+  </path>
+  
+  <path id="json2java.runtime.module.classpath">
+    <pathelement location="${json2java.testoutput.dir}"/>
+    <pathelement location="${json2java.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.json2java">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.json2java">
+    <patternset refid="excluded.from.module.json2java"/>
+  </patternset>
+  
+  <path id="json2java.module.sourcepath">
+    <dirset dir="${module.json2java.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.json2java" depends="compile.module.json2java.production,compile.module.json2java.tests" description="Compile module json2java"/>
+  
+  <target name="compile.module.json2java.production" depends="register.custom.compilers" description="Compile module json2java; production classes">
+    <mkdir dir="${json2java.output.dir}"/>
+    <javac2 destdir="${json2java.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.json2java}/javac">
+      <compilerarg line="${compiler.args.json2java}"/>
+      <bootclasspath refid="json2java.module.bootclasspath"/>
+      <classpath refid="json2java.module.production.classpath"/>
+      <src refid="json2java.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.json2java"/>
+    </javac2>
+    
+    <copy todir="${json2java.output.dir}">
+      <fileset dir="${module.json2java.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.json2java.tests" depends="register.custom.compilers,compile.module.json2java.production" description="compile module json2java; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.json2java" description="cleanup module">
+    <delete dir="${json2java.output.dir}"/>
+    <delete dir="${json2java.testoutput.dir}"/>
+  </target>
+</project>
